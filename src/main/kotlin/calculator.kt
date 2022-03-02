@@ -21,26 +21,26 @@ class Calculator {
                 return "Ошибка!!! Пример содержит некорректные символы!"
             }
         }
-        val str = "+-/"
+        val signs = "+-/"
         //Проверки на различные ошибки про вводе выражения
         for (char in expression.indices) {
 
-            if (expression[char] == ' ' && (expression[char + 1] in str.first()..str.last() || expression[char + 1] == '*') && expression[char + 2] in '0'..'9') {
+            if (expression[char] == ' ' && (expression[char + 1] in signs.first()..signs.last() || expression[char + 1] == '*') && expression[char + 2] in '0'..'9') {
                 if (expression[char] == ' ' && (expression[char + 1] == '-') && expression[char + 2] in '0'..'9'){continue}
                 else {
-                    println("Отсутствуют пробелы!")
-                    return "Отсутствуют пробелы!"
+                    println("Отсутствуют пробелы после знака!")
+                    return "Отсутствуют пробелы после знака!"
                 }
 
-            } else if (expression[char] in '0'..'9' && (expression[char + 1] in str.first()..str.last() || expression[char + 1] == '*') && expression[char + 2] == ' ') {
-                println("Отсутствуют пробелы!")
-                return "Отсутствуют пробелы!"
-            } else if (expression[char] in '0'..'9' && (expression[char + 1] in str.first()..str.last() || expression[char + 1] == '*') && expression[char + 2] in '0'..'9') {
-                println("Отсутствуют пробелы!")
-                return "Отсутствуют пробелы!"
-            } else if ((expression[char] in str.first()..str.last() || expression[char] == '*') && (expression[char + 1] in str.first()..str.last() || expression[char + 1] == '*')) {
-                println("Отсутствуют пробелы!")
-                return "Отсутствуют пробелы!"
+            } else if (expression[char] in '0'..'9' && (expression[char + 1] in signs.first()..signs.last() || expression[char + 1] == '*') && expression[char + 2] == ' ') {
+                println("Отсутствуют пробелы до знака!")
+                return "Отсутствуют пробелы до знака!"
+            } else if (expression[char] in '0'..'9' && (expression[char + 1] in signs.first()..signs.last() || expression[char + 1] == '*') && expression[char + 2] in '0'..'9') {
+                println("Отсутствуют пробелы до и после знака!")
+                return "Отсутствуют пробелы до и после знака!"
+            } else if ((expression[char] in signs.first()..signs.last() || expression[char] == '*') && (expression[char + 1] in signs.first()..signs.last() || expression[char + 1] == '*')) {
+                println("Отсутствуют пробелы между знаками!")
+                return "Отсутствуют пробелы между знаками!"
             } else if (expression[char] in '0'..'9' && expression[char + 1] == ' ' && expression[char + 2] in '0'..'9') {
                 println("Введены два числа подряд!")
                 return "Введены два числа подряд!"
@@ -48,81 +48,85 @@ class Calculator {
             if (char + 2 == expression.length) {
                 break
             }
-            if (expression.last() in str.first() .. str.last() || expression.last() == '*'){
+            if (expression.last() in signs.first() .. signs.last() || expression.last() == '*'){
                 println("Ошибка!!! Вы ввели последним символом знак!")
                 return "Ошибка!!! Вы ввели последним символом знак!"
             }
         }
 
-        queueProcessing(expression)
+        listProcessing(expression)
         return ""
     }
 
-    fun queueProcessing(expression: String): String {
-        val spaceQueue = LinkedList<String>()
+    fun listProcessing(expression: String): String {
+        val listExpressionElements = LinkedList<String>()
         var index = 0
 
         //Зполнение элементами
         for (char in expression.indices){
             if (expression[char] == ' ')
             {
-                spaceQueue.add(expression.substring(index, char))
+                listExpressionElements.add(expression.substring(index, char))
                 index = char + 1
             }
             if (char == expression.lastIndex)
             {
-                spaceQueue.add(expression.substring(index, char + 1))
+                listExpressionElements.add(expression.substring(index, char + 1))
             }
         }
 
         //Проверка на два знака
-        for (char in spaceQueue.indices)
+        for (char in listExpressionElements.indices)
         {
-            if ((spaceQueue[char] == "*" || spaceQueue[char] == "/" || spaceQueue[char] == "+" || spaceQueue[char] == "-") && (spaceQueue[char + 1] == "*" || spaceQueue[char + 1] == "/" || spaceQueue[char + 1] == "+" || spaceQueue[char + 1] == "-")) {
+            if ((listExpressionElements[char] == "*" || listExpressionElements[char] == "/" || listExpressionElements[char] == "+" || listExpressionElements[char] == "-") && (listExpressionElements[char + 1] == "*" || listExpressionElements[char + 1] == "/" || listExpressionElements[char + 1] == "+" || listExpressionElements[char + 1] == "-")) {
                 println("Ошибка!!! Вы ввели два знака подряд! Желаете повторить попытку!")
                 return "Ошибка!!! Вы ввели два знака подряд! Желаете повторить попытку!"
+            }
+            if (listExpressionElements[char] == "/" && listExpressionElements[char + 1] == "0") {
+                println("Ошибка!!! Делить на ноль нельзя!")
+                return "Ошибка!!! Делить на ноль нельзя!"
             }
         }
 
         //Упрощение выражения
         var ch = 0
-        while (ch != spaceQueue.lastIndex) {
+        while (ch != listExpressionElements.lastIndex) {
             var num: Int
-            if (spaceQueue.elementAt(ch) == "*") {
-                num = spaceQueue.elementAt(ch - 1).toInt()
-                num *= spaceQueue.elementAt(ch + 1).toInt()
+            if (listExpressionElements.elementAt(ch) == "*") {
+                num = listExpressionElements.elementAt(ch - 1).toInt()
+                num *= listExpressionElements.elementAt(ch + 1).toInt()
                 for (n in 0 .. 2)
-                    spaceQueue.removeAt(ch - 1)
-                spaceQueue.add(ch - 1, num.toString())
+                    listExpressionElements.removeAt(ch - 1)
+                listExpressionElements.add(ch - 1, num.toString())
                 ch = 0
             }
-            else if (spaceQueue.elementAt(ch) == "/") {
-                num = spaceQueue.elementAt(ch - 1).toInt()
-                num /= spaceQueue.elementAt(ch + 1).toInt()
+            else if (listExpressionElements.elementAt(ch) == "/") {
+                num = listExpressionElements.elementAt(ch - 1).toInt()
+                num /= listExpressionElements.elementAt(ch + 1).toInt()
                 for (n in 0 .. 2)
-                    spaceQueue.removeAt(ch - 1)
-                spaceQueue.add(ch - 1, num.toString())
+                    listExpressionElements.removeAt(ch - 1)
+                listExpressionElements.add(ch - 1, num.toString())
                 ch = 0
             }
-            if (spaceQueue.size == 1)
+            if (listExpressionElements.size == 1)
                 break
             ch++
         }
 
         //Подсчёт выражения
-        var num = spaceQueue.first.toInt()
-        spaceQueue.removeFirst()
-        while (!spaceQueue.isEmpty())
+        var num = listExpressionElements.first.toInt()
+        listExpressionElements.removeFirst()
+        while (!listExpressionElements.isEmpty())
         {
-            if (spaceQueue.first == "+") {
-                spaceQueue.removeFirst()
-                num += spaceQueue.first.toInt()
+            if (listExpressionElements.first == "+") {
+                listExpressionElements.removeFirst()
+                num += listExpressionElements.first.toInt()
             }
-            if (spaceQueue.first == "-") {
-                spaceQueue.removeFirst()
-                num -= spaceQueue.first.toInt()
+            if (listExpressionElements.first == "-") {
+                listExpressionElements.removeFirst()
+                num -= listExpressionElements.first.toInt()
             }
-            spaceQueue.removeFirst()
+            listExpressionElements.removeFirst()
         }
         println(num)
 

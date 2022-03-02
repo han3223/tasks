@@ -25,6 +25,4 @@ fun main() {
 
     println("$word встречается чаще всего")
     println("Она встречается $wordNum раз")
-
-
 }
